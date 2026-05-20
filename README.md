@@ -1,1 +1,1 @@
-# azure-infrastructure-lab
+# Azure Infrastructure Lab
