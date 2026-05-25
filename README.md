@@ -14,19 +14,19 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
          Application Gateway              NAT Gateway
          (51.142.231.76)                 (outbound only)
          uksouth                                 │
-         appgw-vnet (10.1.0.0/16)               │
+         appgw-vnet (10.1.0.0/16)                │
                     │                            │
          VNet Peering (cross-region)             │
                     │                            │
         ┌───────────┴────────────────────────────┤
-        │                   │                   │
+        │                   │                    │
    Public Subnet       Management Subnet     SOC Subnet
    (10.0.1.0/24)       (10.0.3.0/24)       (10.0.5.0/24)
    public-nsg          management-nsg        soc-nsg
-        │                   │                   │
+        │                   │                    │
  public-web-container  management-vm       soc-target-vm
  (Nginx - web layer)   (Jump box)         (Windows Server 2022)
- ◄── App Gateway           │                   │
+ ◄── App Gateway            │                    │
      Backend Pool      Azure Bastion        Microsoft Sentinel
                             │              (Log ingestion via AMA)
                     ┌───────┘
