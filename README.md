@@ -1,6 +1,6 @@
 # Azure Infrastructure Lab
 
-A hands-on Azure infrastructure lab built to develop practical skills across compute, networking, identity, storage, and governance — aligned to the AZ-104 Microsoft Azure Administrator exam objectives. Built to demonstrate real-world infrastructure engineering capability in hybrid cloud environments relevant to enterprise and UK government deployments.
+A hands-on Azure infrastructure lab built to develop practical skills across compute, networking, identity, storage, and governance, aligned to the AZ-104 Microsoft Azure Administrator exam objectives. Built to demonstrate real-world infrastructure engineering capability in hybrid cloud environments relevant to enterprise and UK government deployments.
 
 ---
 
