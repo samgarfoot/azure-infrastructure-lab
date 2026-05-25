@@ -1,6 +1,6 @@
 # Prerequisites
 
-Everything required to deploy and reproduce the Azure Infrastructure Lab.
+Everything required to deploy and reproduce my Azure Infrastructure Lab on a Macbook.
 
 ---
 
@@ -74,4 +74,5 @@ az network application-gateway stop \
 ## Related Projects
 
 - [Azure SOC Lab](https://github.com/samgarfoot/azure-soc-lab) — Microsoft Sentinel, KQL detection engineering, SOAR automation
+- [AWS Infrastructure Lab](https://github.com/samgarfoot/aws-hybrid-infrastructure-lab) - AWS infrastructure project
 - [AWS Security Auditor](https://github.com/samgarfoot/aws-security-auditor) — Automated AWS security scanning aligned to CIS and NIST
