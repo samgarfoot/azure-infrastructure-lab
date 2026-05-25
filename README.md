@@ -446,4 +446,5 @@ curl http://51.142.231.76 - Nginx HTTP 200 ✅
 - **Cloud:** Microsoft Azure
 - **Regions:** North Europe (primary), UK South (Application Gateway)
 - **Certification Target:** AZ-104 Microsoft Azure Administrator → AZ-500 Azure Security Engineer
-- **Related Project:** [Azure SOC Lab](https://github.com/samgarfoot/azure-soc-lab) — Microsoft Sentinel, KQL detection engineering, SOAR automation
+- **Prerequisites:** See [prerequisites.md](prerequisites.md)
+- **Related Project:** [Azure SOC Lab](https://github.com/samgarfoot/azure-soc-lab)
