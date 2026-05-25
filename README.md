@@ -7,11 +7,18 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
 ## Lab Architecture
 
 ```
-                        Internet
-                            │
-                    NAT Gateway (outbound only)
-                            │
-        ┌───────────────────┼───────────────────┐
+                               Internet
+                                  │
+                    ┌─────────────┴──────────────┐
+                    │                            │
+         Application Gateway              NAT Gateway
+         (51.142.231.76)                 (outbound only)
+         uksouth                                 │
+         appgw-vnet (10.1.0.0/16)               │
+                    │                            │
+         VNet Peering (cross-region)             │
+                    │                            │
+        ┌───────────┴────────────────────────────┤
         │                   │                   │
    Public Subnet       Management Subnet     SOC Subnet
    (10.0.1.0/24)       (10.0.3.0/24)       (10.0.5.0/24)
@@ -19,8 +26,8 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
         │                   │                   │
  public-web-container  management-vm       soc-target-vm
  (Nginx - web layer)   (Jump box)         (Windows Server 2022)
-                            │                   │
-                       Azure Bastion        Microsoft Sentinel
+ ◄── App Gateway           │                   │
+     Backend Pool      Azure Bastion        Microsoft Sentinel
                             │              (Log ingestion via AMA)
                     ┌───────┘
                     │
@@ -50,20 +57,26 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
 
 | Component | Purpose | Subnet | Status |
 |---|---|---|---|
-| `azure-infra-vnet` | Core virtual network (10.0.0.0/16) | — | ✅ Deployed |
-| `public-subnet` | Internet-facing tier (10.0.1.0/24) | — | ✅ Deployed |
-| `private-subnet` | Isolated app tier (10.0.2.0/24) | — | ✅ Deployed |
-| `management-subnet` | Admin access tier (10.0.3.0/24) | — | ✅ Deployed |
-| `AzureBastionSubnet` | Bastion dedicated subnet (10.0.4.0/26) | — | ✅ Deployed |
-| `soc-subnet` | Security monitoring tier (10.0.5.0/24) | — | ✅ Deployed |
+| `azure-infra-vnet` | Core virtual network (10.0.0.0/16) — northeurope | — | ✅ Deployed |
+| `public-subnet` | Internet-facing tier (10.0.1.0/24) | azure-infra-vnet | ✅ Deployed |
+| `private-subnet` | Isolated app tier (10.0.2.0/24) | azure-infra-vnet | ✅ Deployed |
+| `management-subnet` | Admin access tier (10.0.3.0/24) | azure-infra-vnet | ✅ Deployed |
+| `AzureBastionSubnet` | Bastion dedicated subnet (10.0.4.0/26) | azure-infra-vnet | ✅ Deployed |
+| `soc-subnet` | Security monitoring tier (10.0.5.0/24) | azure-infra-vnet | ✅ Deployed |
+| `appgw-vnet` | Application Gateway VNet (10.1.0.0/16) — uksouth | — | ✅ Deployed |
+| `appgw-subnet` | Application Gateway dedicated subnet (10.1.0.0/24) | appgw-vnet | ✅ Deployed |
 | `public-nsg` | Traffic control — public subnet | public-subnet | ✅ Deployed |
 | `private-nsg` | Traffic control — private subnet | private-subnet | ✅ Deployed |
 | `management-nsg` | Traffic control — management subnet | management-subnet | ✅ Deployed |
 | `soc-nsg` | Traffic control — SOC subnet | soc-subnet | ✅ Deployed |
 | `infra-nat-gateway` | Outbound internet for public, management, SOC subnets | — | ✅ Deployed |
 | `azure-infra-bastion` | Secure browser-based VM access | AzureBastionSubnet | ✅ Deployed |
+| `appgw-to-infra` | VNet Peering — appgw-vnet to azure-infra-vnet (cross-region) | — | ✅ Deployed |
+| `infra-to-appgw` | VNet Peering — azure-infra-vnet to appgw-vnet (cross-region) | — | ✅ Deployed |
+| `infra-app-gateway` | Application Gateway Standard_v2 — public traffic ingress | appgw-subnet | ✅ Deployed |
+| `appgw-public-ip` | Static public IP for Application Gateway (51.142.231.76) | — | ✅ Deployed |
 | `management-vm` | Jump box — no public IP, Bastion access only | management-subnet | ✅ Deployed |
-| `public-web-container` | Nginx web server — public facing tier | public-subnet | ✅ Deployed |
+| `public-web-container` | Nginx web server — public facing tier, App Gateway backend | public-subnet | ✅ Deployed |
 | `infra-lab-container` | App layer — isolated, no internet access | private-subnet | ✅ Deployed |
 | `soc-target-vm` | Windows Server 2022 — security monitoring target | soc-subnet | ✅ Deployed |
 
