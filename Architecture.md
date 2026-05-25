@@ -4,6 +4,43 @@ A detailed explanation of the design decisions behind the Azure Infrastructure L
 
 ---
 
+## Lab Architecture
+
+```
+                               Internet
+                                  │
+                    ┌─────────────┴──────────────┐
+                    │                            │
+         Application Gateway              NAT Gateway
+         (51.142.231.76)                 (outbound only)
+         uksouth                                 │
+         appgw-vnet (10.1.0.0/16)                │
+                    │                            │
+         VNet Peering (cross-region)             │
+                    │                            │
+        ┌───────────┴────────────────────────────┤
+        │                   │                    │
+   Public Subnet       Management Subnet     SOC Subnet
+   (10.0.1.0/24)       (10.0.3.0/24)       (10.0.5.0/24)
+   public-nsg          management-nsg        soc-nsg
+        │                   │                    │
+ public-web-container  management-vm       soc-target-vm
+ (Nginx - web layer)   (Jump box)       (Windows Server 2022)
+ ◄── App Gateway            │                    │
+     Backend Pool      Azure Bastion      Microsoft Sentinel
+                            │          (Log ingestion via AMA)
+                    ┌───────┘                    |
+                    │                     infra-alert-group
+              Private Subnet            (Email notifications)
+              (10.0.2.0/24)
+              private-nsg
+                    │                       infralaborg
+           infra-lab-container           (Storage Account)
+           (App layer - isolated)       hot | cool | archive
+```
+
+---
+
 ## Design Philosophy
 
 The lab is built around three core principles drawn from Zero Trust and CIS security frameworks:
