@@ -79,6 +79,10 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
 | `public-web-container` | Nginx web server — public facing tier, App Gateway backend | public-subnet | ✅ Deployed |
 | `infra-lab-container` | App layer — isolated, no internet access | private-subnet | ✅ Deployed |
 | `soc-target-vm` | Windows Server 2022 — security monitoring target | soc-subnet | ✅ Deployed |
+| `infra-alert-group` | Action group — email alerts to admin | — | ✅ Deployed |
+| `soc-vm-cpu-alert` | Metric alert — SOC VM CPU above 80% | — | ✅ Deployed |
+| `management-vm-cpu-alert` | Metric alert — management VM CPU above 80% | — | ✅ Deployed |
+| `sentinel-failed-login-alert` | Log search alert — failed logins via KQL | — | ✅ Deployed |
 
 ---
 
