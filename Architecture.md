@@ -29,7 +29,7 @@ A detailed explanation of the design decisions behind the Azure Infrastructure L
  ◄── App Gateway            │                    │
      Backend Pool      Azure Bastion      Microsoft Sentinel
                             │          (Log ingestion via AMA)
-                    ┌───────┘                    |
+                    ┌───────┘                    │
                     │                     infra-alert-group
               Private Subnet            (Email notifications)
               (10.0.2.0/24)
@@ -37,6 +37,33 @@ A detailed explanation of the design decisions behind the Azure Infrastructure L
                     │                       infralaborg
            infra-lab-container           (Storage Account)
            (App layer - isolated)       hot | cool | archive
+                    │
+         VNet Peering (cross-region)
+                    │
+        ┌───────────┘
+        │
+   ad-vnet (10.2.0.0/16)
+   swedencentral
+        │
+   ad-subnet (10.2.1.0/24)
+        │
+      ad-01
+   corp.infralab.local
+   ├── Domain Controller
+   ├── DNS Server
+   ├── Global Catalog
+   ├── All FSMO Roles
+   └── AD Structure
+       ├── Employees
+       │   ├── IT (jsmith, sconnor)
+       │   ├── Finance (jbrown, ewilson)
+       │   └── HR (cdavies, mtaylor)
+       ├── Groups
+       │   ├── IT-Staff
+       │   ├── Finance-Staff
+       │   └── HR-Staff
+       ├── Service Accounts
+       └── Corp Computers
 ```
 
 ---
