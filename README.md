@@ -471,21 +471,6 @@ to enable Bastion access to `ad-01` and future Entra ID Connect hybrid identity 
 | `ad-to-infra` | ad-vnet → azure-infra-vnet | ✅ Connected |
 | `infra-to-ad` | azure-infra-vnet → ad-vnet | ✅ Connected |
 
-```
-corp.infralab.local
-├── Employees
-│   ├── IT
-│   ├── Finance
-│   └── HR
-├── Service Accounts
-├── Groups
-└── Corp Computers
-```
-
----
-
-### Users
-Created six domain user accounts distributed across departmental OUs.
 
 | Name | SAM Account | OU | Department |
 |---|---|---|---|
@@ -497,38 +482,6 @@ Created six domain user accounts distributed across departmental OUs.
 | Mike Taylor | mtaylor | OU=HR,OU=Employees | HR |
 
 ---
-
-### Security Groups
-Created Global Security Groups in the Groups OU with departmental membership.
-
-| Group | Scope | Members |
-|---|---|---|
-| IT-Staff | Global Security | jsmith, sconnor |
-| Finance-Staff | Global Security | jbrown, ewilson |
-| HR-Staff | Global Security | cdavies, mtaylor |
-
----
-
-### Password & Lockout Policy
-Configured domain-wide password and account lockout policy via `Set-ADDefaultDomainPasswordPolicy`.
-
-| Setting | Value | Purpose |
-|---|---|---|
-| Minimum Password Length | 12 characters | Reduces brute force risk |
-| Password History | 10 passwords | Prevents password reuse |
-| Maximum Password Age | 90 days | Forces regular rotation |
-| Minimum Password Age | 1 day | Prevents immediate reuse |
-| Complexity | Enabled | Requires mixed character types |
-| Lockout Threshold | 5 attempts | Limits brute force attempts |
-| Lockout Duration | 30 minutes | Automatic unlock after cooldown |
-| Observation Window | 30 minutes | Resets failed attempt counter |
-
----
-
----
-
-### Organisational Unit Structure
-Built a logical OU hierarchy mirroring enterprise and UK public sector Active Directory deployments.
 
 ## Security Frameworks Referenced
 
