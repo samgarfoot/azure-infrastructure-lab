@@ -29,7 +29,7 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
  ◄── App Gateway            │                    │
      Backend Pool      Azure Bastion      Microsoft Sentinel
                             │          (Log ingestion via AMA)
-                    ┌───────┘                    |
+                    ┌───────┘                    │
                     │                     infra-alert-group
               Private Subnet            (Email notifications)
               (10.0.2.0/24)
@@ -37,6 +37,33 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
                     │                       infralaborg
            infra-lab-container           (Storage Account)
            (App layer - isolated)       hot | cool | archive
+                    │
+         VNet Peering (cross-region)
+                    │
+        ┌───────────┘
+        │
+   ad-vnet (10.2.0.0/16)
+   swedencentral
+        │
+   ad-subnet (10.2.1.0/24)
+        │
+      ad-01
+   corp.infralab.local
+   ├── Domain Controller
+   ├── DNS Server
+   ├── Global Catalog
+   ├── All FSMO Roles
+   └── AD Structure
+       ├── Employees
+       │   ├── IT (jsmith, sconnor)
+       │   ├── Finance (jbrown, ewilson)
+       │   └── HR (cdavies, mtaylor)
+       ├── Groups
+       │   ├── IT-Staff
+       │   ├── Finance-Staff
+       │   └── HR-Staff
+       ├── Service Accounts
+       └── Corp Computers
 ```
 
 ---
@@ -88,6 +115,11 @@ A hands-on Azure infrastructure lab built to develop practical skills across com
 | `hot-data` | Blob container — active data, Hot tier | infralaborg | ✅ Deployed |
 | `cool-data` | Blob container — infrequent access, Cool tier | infralaborg | ✅ Deployed |
 | `archive-data` | Blob container — long term retention, Archive tier | infralaborg | ✅ Deployed |
+| `ad-vnet` | Active Directory VNet (10.2.0.0/16) — swedencentral | — | ✅ Deployed |
+| `ad-subnet` | Domain Controller subnet (10.2.1.0/24) | ad-vnet | ✅ Deployed |
+| `ad-01` | Windows Server 2022 — Domain Controller | ad-subnet | ✅ Deployed |
+| `ad-to-infra` | VNet Peering — ad-vnet to azure-infra-vnet (cross-region) | — | ✅ Connected |
+| `infra-to-ad` | VNet Peering — azure-infra-vnet to ad-vnet (cross-region) | — | ✅ Connected |
 
 ---
 
@@ -412,6 +444,92 @@ curl http://51.142.231.76 - Nginx HTTP 200 ✅
 
 ---
 
+## 10. Active Directory & Hybrid Identity
+
+### Domain Controller
+Deployed `ad-01` (Windows Server 2022) into `ad-subnet` within `ad-vnet` in Sweden Central.
+Promoted to Domain Controller for a new Active Directory forest with DNS integrated and all FSMO roles held by `ad-01`.
+
+| Setting | Value |
+|---|---|
+| Domain | corp.infralab.local |
+| NetBIOS Name | CORP |
+| Domain Controller | ad-01.corp.infralab.local |
+| IP Address | 10.2.1.4 |
+| Domain Mode | Windows Server 2016 |
+| Global Catalog | Enabled |
+| DNS | Integrated with AD DS |
+
+---
+
+### Cross-Region VNet Peering — ad-vnet to azure-infra-vnet
+Configured bidirectional VNet peering between `ad-vnet` (Sweden Central) and `azure-infra-vnet` (North Europe)
+to enable Bastion access to `ad-01` and future Entra ID Connect hybrid identity synchronisation.
+
+| Peering Link | Direction | Status |
+|---|---|---|
+| `ad-to-infra` | ad-vnet → azure-infra-vnet | ✅ Connected |
+| `infra-to-ad` | azure-infra-vnet → ad-vnet | ✅ Connected |
+
+```
+corp.infralab.local
+├── Employees
+│   ├── IT
+│   ├── Finance
+│   └── HR
+├── Service Accounts
+├── Groups
+└── Corp Computers
+```
+
+---
+
+### Users
+Created six domain user accounts distributed across departmental OUs.
+
+| Name | SAM Account | OU | Department |
+|---|---|---|---|
+| John Smith | jsmith | OU=IT,OU=Employees | IT |
+| Sarah Connor | sconnor | OU=IT,OU=Employees | IT |
+| James Brown | jbrown | OU=Finance,OU=Employees | Finance |
+| Emma Wilson | ewilson | OU=Finance,OU=Employees | Finance |
+| Claire Davies | cdavies | OU=HR,OU=Employees | HR |
+| Mike Taylor | mtaylor | OU=HR,OU=Employees | HR |
+
+---
+
+### Security Groups
+Created Global Security Groups in the Groups OU with departmental membership.
+
+| Group | Scope | Members |
+|---|---|---|
+| IT-Staff | Global Security | jsmith, sconnor |
+| Finance-Staff | Global Security | jbrown, ewilson |
+| HR-Staff | Global Security | cdavies, mtaylor |
+
+---
+
+### Password & Lockout Policy
+Configured domain-wide password and account lockout policy via `Set-ADDefaultDomainPasswordPolicy`.
+
+| Setting | Value | Purpose |
+|---|---|---|
+| Minimum Password Length | 12 characters | Reduces brute force risk |
+| Password History | 10 passwords | Prevents password reuse |
+| Maximum Password Age | 90 days | Forces regular rotation |
+| Minimum Password Age | 1 day | Prevents immediate reuse |
+| Complexity | Enabled | Requires mixed character types |
+| Lockout Threshold | 5 attempts | Limits brute force attempts |
+| Lockout Duration | 30 minutes | Automatic unlock after cooldown |
+| Observation Window | 30 minutes | Resets failed attempt counter |
+
+---
+
+---
+
+### Organisational Unit Structure
+Built a logical OU hierarchy mirroring enterprise and UK public sector Active Directory deployments.
+
 ## Security Frameworks Referenced
 
 | Framework | Application |
@@ -434,7 +552,6 @@ curl http://51.142.231.76 - Nginx HTTP 200 ✅
 - [ ] Azure Load Balancer — internal load balancing between tiers
 - [ ] Terraform — rebuild entire lab as Infrastructure as Code
 - [ ] Defender for Cloud — secure score and recommendation remediation
-- [ ] Active Directory — on-premise identity management
 - [ ] Entra ID Connect — hybrid identity synchronisation
 - [ ] VNet Peering — additional VNet connections
 - [ ] Azure Monitor Workbooks — custom dashboards and visualisations
